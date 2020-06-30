@@ -72,14 +72,15 @@ def getTypeNews(newsUrl: str, mType: str):
 
                 mNew["time"] = time
                 mNew["typs"] = mType
-            # response = session.get(url=href, timeout=(3, 7), proxies=defulProxies, verify=False)
-            # response.encoding = response.apparent_encoding
-            # htmlContent = etree.HTML(response.text)
-            # if htmlContent.xpath("//*[@id='ContentBody']") != None:
-            #    content= htmlContent.xpath("//*[@id='ContentBody']")
-            #    mNew["content"] = str(content)
+            response = session.get(url=href, timeout=(3, 7), proxies=defulProxies, verify=False)
+            response.encoding = response.apparent_encoding
+            htmlContent = etree.HTML(response.text)
+            if htmlContent.xpath("//*[@id='ContentBody']") != None:
+               content= htmlContent.xpath("string(//*[@id='ContentBody'])")
+               mNew["content"] = content
+
             NewsDbUtli.insertNews(mNew.get("title").strip(), mNew.get("desc").strip(), mNew.get("time").strip(),
-                                  mNew.get("typs").strip(), mNew.get("href").strip(), mNew.get("src").strip(), "")
+                                  mNew.get("typs").strip(), mNew.get("href").strip(), mNew.get("src").strip(), mNew.get("content").strip())
         print(news)
 
 
