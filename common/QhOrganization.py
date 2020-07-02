@@ -1,5 +1,4 @@
 # 期货机构的爬虫页面
-import sys
 import requests, sys, time, random, urllib.request
 from lxml import etree
 from dao import NewsDbUtli
