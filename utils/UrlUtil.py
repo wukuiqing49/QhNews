@@ -13,6 +13,7 @@ def parse_url(url):
     return response.text
 
 
+@retry(stop_max_attempt_number=10)
 def parse_url_get(url):
     session = requests.session()
     response = session.get(url=url, timeout=10)
