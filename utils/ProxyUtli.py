@@ -8,11 +8,18 @@ from utils import UrlUtil
 proxyServicePath = 'https://ip.jiangxianli.com/api/proxy_ips?page=1&country=中国&order_by="validated_at"'
 
 
-# 获取代理服务器地址
+# 获取代理服务器地址 多个代理
 def getProxyUtil():
     content = UrlUtil.parse_url_get(proxyServicePath)
-    json.loads(content)
-    print(content)
+    content = json.loads(content)
+    proxyList = []
+    if content['data'] != None:
+        for itemBean in content['data']['data']:
+            proxy = {}
+            proxy[itemBean['protocol']] = itemBean['ip'] + ':' + itemBean['port']
+            proxyList.append(proxy)
+    else:
+        return ""
+    return proxyList
 
-
-getProxyUtil()
+# getProxyUtil()
