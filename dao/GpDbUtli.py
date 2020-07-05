@@ -219,3 +219,33 @@ def insertGpTopNews(gp_title, gp_icon, gp_type, gp_detail):
     con.commit()
     cur.close()
     con.close()
+
+
+# 机构类型
+def createGpOrganizationTable():
+    con = getDbconnect()
+    sql = '''
+          CREATE TABLE IF NOT EXISTS gp_org
+              (id INTEGER PRIMARY KEY autoincrement,
+                gp_name TEXT)
+          '''
+    try:
+        # 主要就是上面的语句
+        con.execute(sql)
+    except:
+        print
+        "Create table failed"
+        return False
+    con.execute(sql)
+    con.commit()
+
+# 插入 股票数据
+def insertGpOrgType(orgName):
+    print(orgName + ":")
+    con = getDbconnect()
+    cur = con.cursor()
+    sql = "INSERT INTO gp_org VALUES (?,?)"
+    cur.execute(sql, (None, orgName))
+    con.commit()
+    cur.close()
+    con.close()
