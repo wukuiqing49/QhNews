@@ -17,7 +17,7 @@ def getNewsDetail(news):
 
     if htmlContent.xpath('.//div[@class="content-wrap"]') != None and len(
             htmlContent.xpath('.//div[@class="content"]')) > 0:
-        detail = str(htmlContent.xpath("string(.//div[@class='content'])"))
+        detail = str(htmlContent.xpath("string(.//article[@class='article-content'])"))
         news['newsDetail'] = detail
         # 作者名字
         news['authorName'] = htmlContent.xpath('.//div[@class="meta"]/span')[1].text
@@ -33,44 +33,45 @@ def getNewsDetail(news):
 def getHomeInfo():
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(baseUrl))
 
-    hotContent =htmlContent.xpath(".//ul[@class='article-list']")[0]
+    hotContent = htmlContent.xpath(".//ul[@class='article-list']")[0]
     hotList = []
     for hotNews in list(hotContent):
         news = {}
         # 文章id
-        news['newsId']="".join(list(filter(str.isdigit, str(hotNews.xpath('./a/@href')[0]))))
+        news['newsId'] = "".join(list(filter(str.isdigit, str(hotNews.xpath('./a/@href')[0]))))
         # 作者id
-        news['authorId']=""
+        news['authorId'] = ""
         # 作者名字
-        news['authorName']=""
+        news['authorName'] = ""
 
-        news['authorDesc']=""
+        news['authorDesc'] = ""
         # 标题
-        if(len(hotNews.xpath('.//div[@class="tit"]'))>0):
+        if (len(hotNews.xpath('.//div[@class="tit"]')) > 0):
             news['newsTitle'] = hotNews.xpath('.//div[@class="tit"]')[0].text
         else:
-            news['newsTitle'] =str(hotNews.xpath('.//div/a/@title')[0])
+            news['newsTitle'] = str(hotNews.xpath('.//div/a/@title')[0])
 
         # 简介
-        news['newsDesc']=""
+        news['newsDesc'] = ""
         # 图片
-        news['newsIcon']=str(hotNews.xpath('.//img/@src')[0])
+        news['newsIcon'] = str(hotNews.xpath('.//img/@src')[0])
         # 类型
-        news['newsType']="hot"
+        news['newsType'] = "hot"
         # 查看数
-        news['newsWatch']=""
+        news['newsWatch'] = ""
         # 时间
-        news['newsTime']=""
+        news['newsTime'] = ""
         # 详情
-        news['newsDetail']=""
+        news['newsDetail'] = ""
         hotList.append(news)
 
     for news in hotList:
         getNewsDetail(news)
-    print("content")
+
+
 
 # 获取类型资讯的数据
-def getNewsListByType(url,tag):
+def getNewsListByType(url, tag):
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(url))
 
     listContent = htmlContent.xpath('.//article[@class="excerpt"]')
@@ -94,19 +95,18 @@ def getNewsListByType(url,tag):
         title = data.xpath('./header/h2/a')[0].text
         news['newsTitle'] = title
         # 简介
-        if len(data.xpath('./p')) < 1 or data.xpath('./p')[0].text is None:
+        if data.xpath('./p') is None:
             news['newsDesc'] = ''
         else:
             news['newsDesc'] = data.xpath('./p')[0].text
 
-
-
         # 图片
-        if len(data.xpath('./div/a/img/@src'))>0:
+
+        if len(data.xpath('./div/a/img/@src'))==0 or data.xpath('./div/a/img/@src')[0] is None :
+            news['newsIcon'] = ""
+        else:
             rectangle_img = str(data.xpath('./div/a/img/@src')[0])
             news['newsIcon'] = rectangle_img
-        else:
-            news['newsIcon'] = ""
         # 类型
 
         news['newsType'] = tag
@@ -121,6 +121,7 @@ def getNewsListByType(url,tag):
     # 获取json数据
 
     for news in listNews:
+
         getNewsTagDetail(news)
 
 
@@ -129,24 +130,23 @@ def getNewsTagDetail(news):
     url = newsUrl % (news['newsId'])
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(url))
 
-    if htmlContent.xpath('.//div[@class="content-wrap"]') != None and len(
+    if len(
             htmlContent.xpath('.//div[@class="content"]')) > 0:
-        detail = str(htmlContent.xpath("string(.//div[@class='content'])"))
+        detail = str(htmlContent.xpath("string(.//article[@class='article-content'])"))
         news['newsDetail'] = detail
         QklDbUtli.insertQklNews(news)
         print(news['newsTitle'])
 
 
-
 def getTag():
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(baseUrl))
     tagContent = htmlContent.xpath('.//div[@class="d_tags"]/a')
-    tagList = []
+
     for tag in tagContent:
-        url=baseUrl+str(tag.xpath('./@href')[0])
-        list=getNewsListByType("https://www.55coin.com/newstags/79.html",tag.text)
-        print(tag.text)
+        url = baseUrl + str(tag.xpath('./@href')[0])
+        QklDbUtli.insertTag(tag.text)
+        # getNewsListByType(url, tag.text)
 
 
-#getHomeInfo()
+# getHomeInfo()
 getTag()

@@ -4,7 +4,6 @@ from lxml import etree
 from dao import QklDbUtli
 from utils import UrlUtil
 
-
 # 初始化区块链资讯表
 QklDbUtli.createQklNewsTable()
 QklDbUtli.createQkl7X24NewsTable()
@@ -86,9 +85,10 @@ def getNewsDetail(news):
     url = newsUrl % (news['newsId'])
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(url))
 
-    if htmlContent.xpath('.//div[@class="content-wrap"]') != None and len(
+    if len(
             htmlContent.xpath('.//div[@class="content"]')) > 0:
-        detail = str(htmlContent.xpath("string(.//div[@class='content'])"))
+        detail = str(htmlContent.xpath("string(.//article[@class='article-content'])"))
+
         news['newsDetail'] = detail
         QklDbUtli.insertQklNews(news)
         print(news['newsTitle'])
@@ -113,9 +113,9 @@ def getNews7x24Detail(news):
     url = news7x24Detail % (news['newsId'])
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(url))
 
-    if htmlContent.xpath('.//div[@class="content-wrap"]') != None and len(
+    if len(
             htmlContent.xpath('.//div[@class="content"]')) > 0:
-        detail = str(htmlContent.xpath("string(.//div[@class='content'])"))
+        detail = str(htmlContent.xpath("string(.//article[@class='article-content'])"))
         news['newsDetail'] = detail
         QklDbUtli.insert7x24News(news)
         print(news['newsTitle'])
@@ -157,12 +157,12 @@ def getNewsList24():
 
 def getAuthorNewsDetails(author):
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(author['href']))
-    if htmlContent.xpath('.//div[@class="content-wrap"]') != None and len(
+    if len(
             htmlContent.xpath('.//div[@class="content"]')) > 0:
-        detail = str(htmlContent.xpath("string(.//div[@class='content'])"))
+        detail = str(htmlContent.xpath("string(.//article[@class='article-content'])"))
         author['newsDetail'] = detail.strip()
         QklDbUtli.insertQklAuthorsNews(author)
-        print(author['newsTitle'])
+        print("标题:"+author['newsTitle'])
 
 
 def getAuthorDetail(author):
@@ -171,7 +171,7 @@ def getAuthorDetail(author):
 
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(url))
 
-    if htmlContent.xpath('.//article[@class="excerpt"]') != None and len(
+    if len(
             htmlContent.xpath('.//article[@class="excerpt"]')) > 0:
         ulcontent = htmlContent.xpath('.//article[@class="excerpt"]')
         authorNews = []
@@ -180,22 +180,22 @@ def getAuthorDetail(author):
         for news in ulcontent:
             if len(authorNews) < 16:
                 authornew = {}
-                authornew['newsDesc'] = ''
+
                 authornew['authorFuns'] = author['authorFuns']
                 authornew['authorNews'] = author['authorNews']
                 authornew['authorId'] = author['authorId']
                 authornew['authorName'] = author['authorName']
-
+                authornew['authorDesc'] = author['authorDesc']
 
                 authornew['authorName'] = author['authorName']
                 authornew['authorIcon'] = author['authorIcon']
                 authornew['authorSupport'] = author['authorSupport']
 
                 authornew['newsTitle'] = str(news.xpath('./header/h2/a/@title')[0])
-                if news.xpath('./p') is None and len(news.xpath('./p'))>0:
-                    authornew['newsDesc'] = news.xpath('./p')[0].text
-                else:
+                if news.xpath('./p')[0].text is None:
                     authornew['newsDesc'] = ''
+                else:
+                    authornew['newsDesc'] = news.xpath('./p')[0].text
                 authornew['newsIcon'] = str(news.xpath('./div/a/img/@src')[0])
                 # 类型
                 authornew['newsType'] = news.xpath('./header/a')[0].text
@@ -207,13 +207,14 @@ def getAuthorDetail(author):
                 authorNews.append(authornew)
 
         for news in authorNews:
+            print("")
             getAuthorNewsDetails(news)
 
 
 def getAuthorList():
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(newsAuthorListUrl))
 
-    if htmlContent.xpath('.//ul[@id="column_rank"]') != None and len(
+    if len(
             htmlContent.xpath('.//ul[@id="column_rank"]')) > 0:
         ulcontent = htmlContent.xpath('.//ul[@id="column_rank"]')[0]
         authorList = []
@@ -222,17 +223,18 @@ def getAuthorList():
             author['authorId'] = str(data.xpath('./a/@user_id')[0])
             author['authorName'] = data.xpath('./a/div/strong')[0].text
 
-            if data.xpath('./a/div/span')[0].text is None and len(data.xpath('./a/div/span')) > 0:
-                author['authorDesc'] = data.xpath('./a/div/span')[0].text
+            if data.xpath('./a/div/span')[0].text is None:
+                author['authorDesc'] = ""
             else:
                 author['authorDesc'] = data.xpath('./a/div/span')[0].text
+
             author['authorIcon'] = str(data.xpath('./a/img/@src')[0])
             author['authorSupport'] = str(data.xpath('./div')[0].text)
             authorList.append(author)
 
         for author in authorList:
             getAuthorDetail(author)
-        print(ulcontent)
+
 
 
 # 7x24
@@ -240,5 +242,4 @@ def getAuthorList():
 # 区块链资讯
 # getNewsListByTag()
 # 作者
-getAuthorList()
-
+# getAuthorList()
