@@ -1,7 +1,19 @@
 # 期货资讯爬虫启动页面
+from common import QklSpecial
+from common import QkNewsHome
 
-from dao import NewsDbUtli
-from common import QhNews
+
+# 获取区块链新闻
+def getQklNews():
+    QkNewsHome.getHomeInfo()
+    QkNewsHome.getTag()
+    QkNewsHome.getTagNews()
+
+    QklSpecial.getNewsList24()
+    # 区块链资讯
+    QklSpecial.getNewsListByTag()
+    # 作者
+    QklSpecial.getAuthorList()
 
 # 机构数据
 # NewsDbUtli.createOrganizationTable()
@@ -19,3 +31,5 @@ from common import QhNews
 # 初始化数据库 top人物数据
 # GpDbUtli.createGpTpTable()
 # getNewsType("TopNews")
+
+getQklNews()

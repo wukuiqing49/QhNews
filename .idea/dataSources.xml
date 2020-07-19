@@ -29,7 +29,7 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="qkl_news" uuid="9dce9e56-921c-46d1-b4aa-592690241149">
+    <data-source source="LOCAL" name="qkl_news" uuid="0d3bb024-ce7c-474f-9fde-788aa3338e80">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>

@@ -69,7 +69,6 @@ def getHomeInfo():
         getNewsDetail(news)
 
 
-
 # 获取类型资讯的数据
 def getNewsListByType(url, tag):
     htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(url))
@@ -102,7 +101,7 @@ def getNewsListByType(url, tag):
 
         # 图片
 
-        if len(data.xpath('./div/a/img/@src'))==0 or data.xpath('./div/a/img/@src')[0] is None :
+        if len(data.xpath('./div/a/img/@src')) == 0 or data.xpath('./div/a/img/@src')[0] is None:
             news['newsIcon'] = ""
         else:
             rectangle_img = str(data.xpath('./div/a/img/@src')[0])
@@ -121,7 +120,6 @@ def getNewsListByType(url, tag):
     # 获取json数据
 
     for news in listNews:
-
         getNewsTagDetail(news)
 
 
@@ -148,5 +146,13 @@ def getTag():
         # getNewsListByType(url, tag.text)
 
 
+def getTagNews():
+    htmlContent = etree.HTML(UrlUtil.parse_url_get_proxy(baseUrl))
+    tagContent = htmlContent.xpath('.//div[@class="d_tags"]/a')
+
+    for tag in tagContent:
+        url = baseUrl + str(tag.xpath('./@href')[0])
+        getNewsListByType(url, tag.text)
+
 # getHomeInfo()
-getTag()
+# getTag()
